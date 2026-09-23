@@ -32,6 +32,13 @@ function fmt(iso) {
   const d = new Date(iso)
   return `${d.getMonth() + 1}月${d.getDate()}日`
 }
+
+function fmtTime(iso) {
+  const d = new Date(iso)
+  const hh = String(d.getHours()).padStart(2, '0')
+  const mm = String(d.getMinutes()).padStart(2, '0')
+  return `${d.getMonth() + 1}月${d.getDate()}日 ${hh}:${mm}`
+}
 </script>
 
 <template>
@@ -96,6 +103,18 @@ function fmt(iso) {
         <div class="stat-line"><span>临期食材</span><b>{{ inventory.nearExpiryItems.length }}</b></div>
         <div class="stat-line"><span>浪费率</span><b>{{ (stats.wasteRate * 100).toFixed(1) }}%</b></div>
         <div class="stat-line"><span>成就徽章</span><b>{{ achievements.progress.unlocked }} / {{ achievements.progress.total }}</b></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">⭐ 积分明细</div>
+      <div v-if="!user.pointsHistory.length" class="muted">暂无积分记录，去完成挑战赚取积分吧！</div>
+      <div v-else class="history">
+        <div v-for="p in user.pointsHistory" :key="p.id" class="hist-row">
+          <span class="reason">{{ p.reason }}</span>
+          <span class="muted">{{ fmtTime(p.date) }}</span>
+          <span class="pt">+{{ p.points }}</span>
+        </div>
       </div>
     </div>
 
@@ -208,6 +227,14 @@ h2 {
 .hist-row .items {
   flex: 1;
   color: var(--text-2);
+}
+.hist-row .reason {
+  flex: 1;
+  color: var(--text);
+}
+.pt {
+  font-weight: 600;
+  color: var(--warn);
 }
 .total {
   font-weight: 600;
