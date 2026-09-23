@@ -8,6 +8,7 @@ import { useAchievementsStore } from '@/stores/achievements'
 import { useStatsStore } from '@/stores/stats'
 import { CATEGORIES, CATEGORY_ICONS } from '@/constants'
 import BaseButton from '@/components/common/BaseButton.vue'
+import BaseEmpty from '@/components/common/BaseEmpty.vue'
 
 const user = useUserStore()
 const inventory = useInventoryStore()
@@ -31,6 +32,13 @@ function saveProfile() {
 function fmt(iso) {
   const d = new Date(iso)
   return `${d.getMonth() + 1}月${d.getDate()}日`
+}
+
+// 积分明细时间：精确到分钟
+function fmtDateTime(iso) {
+  const d = new Date(iso)
+  const pad = (v) => String(v).padStart(2, '0')
+  return `${d.getMonth() + 1}月${d.getDate()}日 ${pad(d.getHours())}:${pad(d.getMinutes())}`
 }
 </script>
 
@@ -67,6 +75,25 @@ function fmt(iso) {
           </div>
         </div>
       </template>
+    </div>
+
+    <div class="card">
+      <div class="section-title points-title">
+        <span>⭐ 积分明细</span>
+        <span class="points-total">共 {{ user.points }} 积分</span>
+      </div>
+      <BaseEmpty
+        v-if="!user.pointRecords.length"
+        emoji="⭐"
+        text="还没有积分记录，去完成冰箱清理挑战赚取积分吧！"
+      />
+      <div v-else class="points-list">
+        <div v-for="r in user.pointRecords" :key="r.id" class="point-row">
+          <span class="point-reason">{{ r.reason }}</span>
+          <span class="point-time muted">{{ fmtDateTime(r.date) }}</span>
+          <span class="point-add">+{{ r.points }}</span>
+        </div>
+      </div>
     </div>
 
     <div class="grid grid-3">
@@ -165,6 +192,44 @@ h2 {
 .edit-actions {
   display: flex;
   gap: 8px;
+}
+.points-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.points-total {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text-2);
+}
+.points-list {
+  display: flex;
+  flex-direction: column;
+}
+.point-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+}
+.point-row:last-child {
+  border-bottom: none;
+}
+.point-reason {
+  flex: 1;
+}
+.point-time {
+  font-size: 12px;
+  white-space: nowrap;
+}
+.point-add {
+  font-weight: 700;
+  color: var(--primary-dark);
+  min-width: 48px;
+  text-align: right;
 }
 .stat-line {
   display: flex;

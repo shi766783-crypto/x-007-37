@@ -35,7 +35,10 @@ export const useChallengeStore = defineStore('challenge', {
         date: new Date().toISOString(),
       }
       this.completed.unshift(record)
-      user.addPoints(CHALLENGE_POINTS)
+      user.addPoints(
+        CHALLENGE_POINTS,
+        `完成冰箱清理挑战：${ingredientName} → 做了「${dishName}」`,
+      )
       this.persist()
       return record
     },
